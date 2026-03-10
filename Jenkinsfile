@@ -40,7 +40,7 @@ pipeline {
                         ./mvnw sonar:sonar \
                         -Dsonar.projectKey=guestbook \
                         -Dsonar.host.url=http://43.203.246.58:9000 \
-                        -Dsonar.login=21193ff67973f0efc068ac33ce547e3da8c671b7
+                        -Dsonar.login=bf58c1410eda81ffc926f3c86ad2f9066d54a20e
                     '''
                 }
             }
