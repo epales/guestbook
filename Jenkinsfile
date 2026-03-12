@@ -46,7 +46,7 @@ pipeline {
             }
         }
         stage('Docker Image Push') {
-            aagent any
+            agent any
             steps {
                 script {
                     docker.withRegistry('', 'DockerHub_Credential') {
