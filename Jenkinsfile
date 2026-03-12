@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat
 def TODAY = (new SimpleDateFormat("yyyyMMddHHmmss")).format(new Date())
 
 pipeline {
-    agent { label 'master' }
+    agent any
     environment {
         strDockerTag = "${TODAY}_${BUILD_ID}"
         strDockerImage ="selenedis/cicd_guestbook:${strDockerTag}"
@@ -11,19 +11,19 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            agent { label 'agent1' }
+            agent any
             steps {
                 git branch: 'master', url:'https://github.com/epales/guestbook.git'
             }
         }
         stage('Build') {
-            agent { label 'agent1' }
+            agent any
             steps {
                 sh './mvnw clean package'
             }
         }
         stage('Unit Test') {
-            agent { label 'agent1' }
+            agent any
             steps {
                 sh './mvnw test'
             }
@@ -35,7 +35,7 @@ pipeline {
             }
         }
         stage('Docker Image Build') {
-            agent { label 'agent2' }
+            agent any
             steps {
                 git branch: 'master', url:'https://github.com/epales/guestbook.git'
                 sh './mvnw clean package'
@@ -46,7 +46,7 @@ pipeline {
             }
         }
         stage('Docker Image Push') {
-            agent { label 'agent2' }
+            aagent any
             steps {
                 script {
                     docker.withRegistry('', 'DockerHub_Credential') {
@@ -56,7 +56,7 @@ pipeline {
             }
         }
         stage ('JMeter LoadTest') {
-            agent { label 'agent1' }
+            agent any
             steps { 
                 sh '~/lab/sw/jmeter/bin/jmeter.sh -j jmeter.save.saveservice.output_format=xml -n -t src/main/jmx/guestbook_loadtest.jmx -l loadtest_result.jtl' 
                 perfReport filterRegex: '', showTrendGraphs: true, sourceDataFiles: 'loadtest_result.jtl' 
