@@ -55,7 +55,6 @@ pipeline {
                 }
             }
         }
-        stage(
         stage ('JMeter LoadTest') {
             agent { label 'agent1' }
             steps { 
