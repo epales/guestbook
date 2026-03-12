@@ -34,42 +34,6 @@ pipeline {
                 }
             }
         }
-
-        stage('SonarQube Analysis') {
-            agent { label 'agent1' }
-            steps{
-                echo 'SonarQube Analysis'
-                /*
-                withSonarQubeEnv('SonarQube-Server'){
-                    sh '''
-                        ./mvnw sonar:sonar \
-                        -Dsonar.projectKey=guestbook \
-                        -Dsonar.host.url=http://192.168.56.143:9000 \
-                        -Dsonar.login=21193ff67973f0efc068ac33ce547e3da8c671b7
-                    '''
-                }
-                */
-            }
-        }
-        stage('SonarQube Quality Gate'){
-            agent { label 'agent1' }
-            steps{
-                echo 'SonarQube Quality Gate'
-                /*
-                timeout(time: 1, unit: 'MINUTES') {
-                    script{
-                        def qg = waitForQualityGate()
-                        if(qg.status != 'OK') {
-                            echo "NOT OK Status: ${qg.status}"
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                        } else{
-                            echo "OK Status: ${qg.status}"
-                        }
-                    }
-                }
-                */
-            }
-        }
         stage('Docker Image Build') {
             agent { label 'agent2' }
             steps {
@@ -91,24 +55,7 @@ pipeline {
                 }
             }
         }
-        stage('Staging Deploy') {
-            agent { label 'master' }
-            steps {
-                sshagent(credentials: ['Staging-PrivateKey']) {
-                    sh "ssh -o StrictHostKeyChecking=no root@172.31.0.110 docker container rm -f guestbookapp"
-                    sh "ssh -o StrictHostKeyChecking=no root@172.31.0.110 docker container run \
-                                        -d \
-                                        -p 38080:80 \
-                                        --name=guestbookapp \
-                                        -e MYSQL_IP=172.31.0.100 \
-                                        -e MYSQL_PORT=3306 \
-                                        -e MYSQL_DATABASE=guestbook \
-                                        -e MYSQL_USER=root \
-                                        -e MYSQL_PASSWORD=education \
-                                        ${strDockerImage} "
-                }
-            }
-        }
+        stage(
         stage ('JMeter LoadTest') {
             agent { label 'agent1' }
             steps { 
@@ -117,24 +64,6 @@ pipeline {
             } 
         }
     }
-    post { 
-        always { 
-            emailext (attachLog: true, body: '본문', compressLog: true
-                    , recipientProviders: [buildUser()], subject: '제목', to: 'yu3papa.j@gmail.com')
-
-        }
-        success { 
-            slackSend(tokenCredentialId: 'slack-token'
-                , channel: '#교육'
-                , color: 'good'
-                , message: "${JOB_NAME} (${BUILD_NUMBER}) 빌드가 성공적으로 끝났습니다. Details: (<${BUILD_URL} | here >)")
-        }
-        failure { 
-            slackSend(tokenCredentialId: 'slack-token'
-                , channel: '#교육'
-                , color: 'danger'
-                , message: "${JOB_NAME} (${BUILD_NUMBER}) 빌드가 실패하였습니다. Details: (<${BUILD_URL} | here >)")
-    }
-  }
+    
 }
 
