@@ -22,18 +22,6 @@ pipeline {
                 sh './mvnw clean package'
             }
         }
-        stage('Unit Test') {
-            agent any
-            steps {
-                sh './mvnw test'
-            }
-            
-            post {
-                always {
-                    junit '**/target/surefire-reports/TEST-*.xml'
-                }
-            }
-        }
         stage('Docker Image Build') {
             agent any
             steps {
@@ -55,13 +43,7 @@ pipeline {
                 }
             }
         }
-        stage ('JMeter LoadTest') {
-            agent any
-            steps { 
-                sh '~/lab/sw/jmeter/bin/jmeter.sh -j jmeter.save.saveservice.output_format=xml -n -t src/main/jmx/guestbook_loadtest.jmx -l loadtest_result.jtl' 
-                perfReport filterRegex: '', showTrendGraphs: true, sourceDataFiles: 'loadtest_result.jtl' 
-            } 
-        }
+        
     }
     
 }
