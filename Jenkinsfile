@@ -37,7 +37,7 @@ pipeline {
             agent any
             steps {
                 script {
-                    docker.withRegistry('', 'DockerHub_Credential') {
+                    docker.withRegistry('', 'Docker-token') {
                         oDockImage.push()
                     }
                 }
